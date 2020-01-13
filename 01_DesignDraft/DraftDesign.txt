@@ -1,0 +1,57 @@
+# Jan12 Initialize project
+Hardware specification:
+  
+  
+Software specification base on ST project sample
+  - Input audio wave can be read from:
+      + External USB key
+      + Internal flash (*) TBD - do it later
+    The external USB can be access through USB FS core (onchip hardware in Host mode)
+    Audio format PCM (Pulse-code modulation / the method to digitally represent sample from analog signal / uncompressed wave data signal / .WAV file)
+
+  - Processing signal:
+      + The wave from USB is parsed to detect sample rate in order to configure the I2S.
+      + The playback is managed with double buffering.
+          First buffer is used to store the wave data retrived from USB key using FatFS
+          Once first buffer is filled, DMA sends it content to I2S peripheral module.
+          The data from USB key is stored in a second buffer.
+          Then these two buffers are swapped indefinitely, till end of process.
+
+Hardware specification from Discovery board
+  (*) LED - User led specification
+      |-----------------------------------------------|
+      |                 LD3(orange-PD13)              |
+      | LD4(green-PD12)                 LD5(red-PD14) |
+      |                 LD6(blue-PD15)                |
+      |-----------------------------------------------|
+      
+          |----------------|      |--------------|
+          | LD7(green-PA9) |      | LD8(red-PD5) |
+          |       USB      |      |      USB     |
+          |  VBUS present  |      | Overcurrent  |
+          |----------------|      |--------------|
+  (*) Button - Uset push button
+      B1 - PA0
+
+  (*) Audio onboard capability (DAC - CS43L22)
+      Output hardware to mini jack connector
+      Hardware connection: 
+        (I2C) PB9   - Audio SDA (Pull-up register)
+              PB6   - Audio SCL (Pull-up register)
+              < I2C address 0x94 >
+
+        (I2S) PC7   - I2S3 MCK
+              PC10  - I2S3 SCK
+              PC12  - I2S3 SD
+              PA4   - I2S3 WS
+
+        (I/O) PD4   - Audio RST   (Pull-down register)
+
+  (*) USB OTG FS
+      - PC0   -> OTG FS PowerSwitchOn   (Enable Vout USB)
+      - PD5   -> OTG FS OverCurrent     (Signal for alarm current)
+      
+      - PA9   -> Vbus                   (Vout if current is safe)
+      - PA10  -> ID       (USB digital signal)
+      - PA11  -> D- out   (USB digital signal)
+      - PA12  -> D+ out   (USB digital signal)
